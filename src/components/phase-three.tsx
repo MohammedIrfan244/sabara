@@ -11,10 +11,6 @@ const dialogueSources = [
   new URL("../assets/text/ollivander-dialogue2.txt", import.meta.url).href,
   new URL("../assets/text/ollivander-dialogue3.txt", import.meta.url).href,
 ];
-const monologueSource = new URL(
-  "../assets/text/ollivander-monologue.txt",
-  import.meta.url,
-).href;
 const monologueAudioSource = new URL(
   "../assets/audio/ollivander-monologue.mp3",
   import.meta.url,
@@ -37,18 +33,17 @@ export function PhaseThree({
 }: PhaseThreeProps) {
   const [talking, setTalking] = useState(false);
   const [dialogueStep, setDialogueStep] = useState(0);
-  const [monologue, setMonologue] = useState(false);
   const [wandRevealed, setWandRevealed] = useState(false);
   const [wandCollected, setWandCollected] = useState(false);
   const [familiar, setFamiliar] = useState(false);
   const [toothlessCollected, setToothlessCollected] = useState(false);
   const [jumping, setJumping] = useState(false);
+  const [swinging, setSwinging] = useState(false);
   const [dialogue, setDialogue] = useState([
     "Curious, very curious…",
     "It is not the wand that chooses lightly.",
     "A little fire, a little loyalty, and an abundance of wonder.",
   ]);
-  const [words, setWords] = useState("The wand has been waiting for you.");
   const monologueAudio = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
@@ -63,29 +58,38 @@ export function PhaseThree({
         ),
       )
       .catch(() => undefined);
-    void fetch(monologueSource)
-      .then((response) => response.text())
-      .then((text) => setWords((current) => text.trim() || current))
-      .catch(() => undefined);
   }, []);
 
-  useEffect(() => () => monologueAudio.current?.pause(), []);
+  useEffect(() => {
+    if (monologueAudio.current) monologueAudio.current.muted = muted;
+  }, [muted]);
 
+  useEffect(
+    () => () => {
+      monologueAudio.current?.pause();
+      onMonologueActive(false);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
+
+  // No text: the monologue just plays while the wand appears
   function beginMonologue() {
-    setMonologue(true);
+    setWandRevealed(true);
     onMonologueActive(true);
+
     const audio = new Audio(monologueAudioSource);
     audio.muted = muted;
     monologueAudio.current = audio;
-    const revealWand = () => {
-      setMonologue(false);
-      setWandRevealed(true);
-      onMonologueActive(false);
-    };
-    audio.addEventListener("ended", revealWand, { once: true });
-    void audio.play().catch(() => {
-      window.setTimeout(revealWand, Math.max(3600, words.length * 42));
+    audio.addEventListener("ended", () => onMonologueActive(false), {
+      once: true,
     });
+    void audio.play().catch(() => onMonologueActive(false));
+  }
+
+  function stopMonologue() {
+    monologueAudio.current?.pause();
+    onMonologueActive(false);
   }
 
   function chooseWand() {
@@ -104,19 +108,36 @@ export function PhaseThree({
     window.setTimeout(() => setJumping(false), 800);
   }
 
+  function swingSign() {
+    setSwinging(true);
+    window.setTimeout(() => setSwinging(false), 1200);
+  }
+
   if (familiar) {
     return (
       <section className="phase-three phase-three--familiar">
         <p className="scene-kicker">A small, faithful presence in the shadows</p>
-        <button
-          aria-label="Greet Toothless"
-          className={`toothless ${jumping ? "toothless--jump" : ""}`}
-          onClick={greetFamiliar}
-          type="button"
-        >
-          <Image alt="Toothless, your familiar" src={toothlessImage} />
-          <i aria-hidden="true" />
-        </button>
+
+        <div className="familiar-frame">
+          <span className="sconce sconce--left" aria-hidden="true">
+            <b className="flame" />
+          </span>
+          <span className="sconce sconce--right" aria-hidden="true">
+            <b className="flame" style={{ animationDelay: "-.7s" }} />
+          </span>
+
+          <div className="familiar-window">
+            <button
+              aria-label="Greet Toothless"
+              className={`toothless ${jumping ? "toothless--jump" : ""}`}
+              onClick={greetFamiliar}
+              type="button"
+            >
+              <Image alt="Toothless, your familiar" src={toothlessImage} />
+            </button>
+          </div>
+        </div>
+
         <p className="familiar-label">Your Familiar</p>
         <p className="familiar-instruction">Tap him gently.</p>
         {toothlessCollected && (
@@ -135,7 +156,7 @@ export function PhaseThree({
         )}
       </section>
     );
-  }
+  } 
 
   if (talking) {
     return (
@@ -148,46 +169,41 @@ export function PhaseThree({
             <span />
           </div>
         )}
-        {wandRevealed && (
+        {wandRevealed && (  
           <button
             aria-label="Flick your new wand"
-            className="wand wand--revealed"
+            className="wand wand--revealed h-64"
             onClick={chooseWand}
             type="button"
           >
             <Image alt="Your new wand" src={wandImage} />
-            <span>{wandCollected ? "Flick again" : "Tap to choose it"}</span>
           </button>
         )}
-        {monologue ? (
-          <article className="monologue">
-            <p>{words}</p>
-            <small>The wandmaker&apos;s voice fills the room…</small>
+        {!wandRevealed && (
+          <article className="dialogue-box">
+            <div className="ollivander-avatar">
+              <Image alt="Mr Ollivander" src={ollivanderImage} />
+            </div>
+            <p>{dialogue[dialogueStep]}</p>
+            <button
+              onClick={() =>
+                dialogueStep === 2
+                  ? beginMonologue()
+                  : setDialogueStep((step) => step + 1)
+              }
+              type="button"
+            >
+              {dialogueStep === 2 ? "Listen" : "Next"}
+            </button>
           </article>
-        ) : (
-          !wandRevealed && (
-            <article className="dialogue-box">
-              <div className="ollivander-avatar">
-                <Image alt="Mr Ollivander" src={ollivanderImage} />
-              </div>
-              <p>{dialogue[dialogueStep]}</p>
-              <button
-                onClick={() =>
-                  dialogueStep === 2
-                    ? beginMonologue()
-                    : setDialogueStep((step) => step + 1)
-                }
-                type="button"
-              >
-                {dialogueStep === 2 ? "Listen" : "Next"}
-              </button>
-            </article>
-          )
         )}
         {wandRevealed && (
           <button
             className="story-button phase-three-next"
-            onClick={() => setFamiliar(true)}
+            onClick={() => {
+              stopMonologue();
+              setFamiliar(true);
+            }}
             type="button"
           >
             Meet your familiar
@@ -199,16 +215,24 @@ export function PhaseThree({
 
   return (
     <section className="phase-three">
-      <button
-        aria-label="Make the Ollivanders sign sway"
-        className="ollivander-sign"
-        onClick={(event) =>
-          event.currentTarget.classList.toggle("ollivander-sign--swing")
-        }
-        type="button"
-      >
-        Ollivanders <small>Makers of Fine Wands</small>
-      </button>
+      <div className="sign-rig">
+        {/* iron rod with brass knobs on both ends */}
+        <div className="sign-rod" aria-hidden="true" />
+
+        <div className={`sign-swing ${swinging ? "sign-swing--swing" : ""}`}>
+          <span className="sign-chain sign-chain--left" aria-hidden="true" />
+          <span className="sign-chain sign-chain--right" aria-hidden="true" />
+          <button
+            aria-label="Make the Ollivanders sign sway"
+            className="ollivander-sign"
+            onClick={swingSign}
+            type="button"
+          >
+            Ollivanders <small>Makers of Fine Wands</small>
+          </button>
+        </div>
+      </div>
+
       <p className="scene-kicker">A narrow shop, filled with old magic</p>
       <button
         className="talk-button"

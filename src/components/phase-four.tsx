@@ -11,6 +11,16 @@ import wandImage from "../assets/images/wand.png";
 
 const letterSource = new URL("../assets/text/letter.txt", import.meta.url).href;
 
+const archCandles = Array.from({ length: 9 }, (_, i) => {
+  const t = (Math.PI * i) / 8;
+  return {
+    left: `${50 - 46 * Math.cos(t)}%`,
+    top: `${90 - 76 * Math.sin(t)}%`,
+    "--d": `${(i * 0.37) % 1.6}s`,
+    "--o": `${i * 0.08}s`,
+  } as React.CSSProperties;
+});
+
 type GiftKey = "letter" | "portrait" | "wand" | "toothless" | "cake";
 type PhaseFourProps = {
   collected: Record<GiftKey, boolean>;
@@ -26,6 +36,11 @@ const gifts: Array<{ key: GiftKey; label: string; detail: string }> = [
     detail: "The parchment that began this little adventure.",
   },
   {
+    key: "toothless",
+    label: "Your Familiar",
+    detail: "A small shadow with a very large heart.",
+  },
+  {
     key: "portrait",
     label: "Lini Portrait",
     detail: "A portrait that quietly glows on the gallery wall.",
@@ -34,11 +49,6 @@ const gifts: Array<{ key: GiftKey; label: string; detail: string }> = [
     key: "wand",
     label: "Your New Wand",
     detail: "Chosen in the old wandmaker's shop.",
-  },
-  {
-    key: "toothless",
-    label: "Your Familiar",
-    detail: "A small shadow with a very large heart.",
   },
   {
     key: "cake",
@@ -64,6 +74,17 @@ export function PhaseFour({
   const [boxOpen, setBoxOpen] = useState(false);
   const [viewing, setViewing] = useState<GiftKey | null>(null);
   const [downloading, setDownloading] = useState(false);
+
+    const [blowing, setBlowing] = useState(false);
+
+  function blowOut() {
+    if (blowing) return;
+    setBlowing(true);
+    window.setTimeout(() => {
+      setWishMade(true);
+      onGiftUnlock();
+    }, 1600);
+  }
 
   async function downloadGiftBox() {
     setDownloading(true);
@@ -123,22 +144,33 @@ export function PhaseFour({
         <p className="scene-kicker">
           One last little spell before the box opens
         </p>
-        <button
-          aria-label="Make a birthday wish"
-          className="cake cake--lit"
-          onClick={() => {
-            setWishMade(true);
-            onGiftUnlock();
-          }}
-          type="button"
-        >
-          <Image alt="A lit birthday cake" src={cakeLit} />
-          <i aria-hidden="true" />
-          <i aria-hidden="true" />
-          <i aria-hidden="true" />
-        </button>
-        <h2>Make a wish</h2>
-        <p className="cake-hint">Tap the candles.</p>
+        <div className={`wish-arch ${blowing ? "wish-arch--out" : ""}`}>
+          <button
+            aria-label="Blow out the candles and make a wish"
+            className="wish-arch__candles"
+            disabled={blowing}
+            onClick={blowOut}
+            type="button"
+          >
+            {archCandles.map((style, i) => (
+              <span className="arch-candle" key={i} style={style} aria-hidden="true">
+                <b className="flame" />
+                <em className="smoke" />
+              </span>
+            ))}
+          </button>
+          <button
+            aria-label="Make a birthday wish"
+            className="cake cake--lit"
+            disabled={blowing}
+            onClick={blowOut}
+            type="button"
+          >
+            <Image alt="A lit birthday cake" src={cakeLit} priority />
+          </button>
+          <h2>Make a wish</h2>
+          <p className="cake-hint">Tap the candles.</p>
+        </div>
       </section>
     );
   }
@@ -190,7 +222,7 @@ export function PhaseFour({
           <div className="gift-grid">
             {gifts.map((gift) => (
               <button
-                className="gift-item"
+                className={`gift-item gift-item--${gift.key}`}
                 key={gift.key}
                 onClick={() => setViewing(gift.key)}
                 type="button"
@@ -216,7 +248,7 @@ export function PhaseFour({
         </div>
       )}
       {currentGift && (
-        <div className="gift-view" role="dialog" aria-label={currentGift.label}>
+        <div className={`gift-view gift-view--${currentGift.key}`} role="dialog" aria-label={currentGift.label}>
           <button
             aria-label="Close keepsake"
             className="modal-close"

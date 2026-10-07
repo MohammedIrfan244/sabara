@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import parchmentTexture from "../assets/images/parchment.jpg";
 import liniPortrait from "../assets/images/lini-portrait.png";
 import photoOne from "../assets/images/photo-1.jpg";
 import photoTwo from "../assets/images/photo-2.jpg";
@@ -126,11 +125,6 @@ export function BirthdayExperience() {
   return (
     <main
       className={`experience experience--${phase}`}
-      style={
-        {
-          "--parchment-texture": `url(${parchmentTexture.src})`,
-        } as React.CSSProperties
-      }
     >
       <div className="experience__grain" />
       <div className="experience__light" />

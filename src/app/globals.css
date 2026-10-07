@@ -832,22 +832,21 @@ button:focus-visible {
   z-index: 2;
   width: min(73vw, 290px);
   border: 0;
-  color: #f2d393;
   background: transparent;
   animation: wand-reveal 1.4s ease forwards;
 }
 .wand img {
   display: block;
   width: 100%;
-  height: 120px;
+  height: 300px;
   object-fit: contain;
-  filter: drop-shadow(0 0 15px #d9a34888);
+  animation: wand-flick 2s ease-in-out infinite;
 }
 .wand span {
   font-style: italic;
 }
 .wand:active img {
-  animation: wand-flick .6s ease;
+  animation: wand-flick 0.9s cubic-bezier(.25, .8, .25, 1);
 }
 .phase-three-next {
   position: absolute;
@@ -922,8 +921,32 @@ button:focus-visible {
   }
 }
 @keyframes wand-flick {
-  50% {
-    transform: rotate(-13deg) translateX(15px);
+  0% {
+    transform: rotate(0deg) translateX(0);
+  }
+
+  18% {
+    transform: rotate(3deg) translateX(-3px);
+  }
+
+  38% {
+    transform: rotate(-16deg) translateX(10px);
+  }
+
+  52% {
+    transform: rotate(7deg) translateX(-3px);
+  }
+
+  68% {
+    transform: rotate(-4deg) translateX(2px);
+  }
+
+  82% {
+    transform: rotate(2deg) translateX(0);
+  }
+
+  100% {
+    transform: rotate(0deg) translateX(0);
   }
 }
 @keyframes toothless-breathe {
@@ -1190,7 +1213,6 @@ button:focus-visible {
   overflow-y: auto;
   padding-top: 8dvh;
   color: #452a16;
-  background: #cfae72 var(--parchment-texture) center / cover;
 }
 .map-ink {
   position: absolute;
@@ -1578,4 +1600,691 @@ button:focus-visible {
   100% {
     transform: translateY(0) scale(1);
   }
+}
+
+
+/* ============================================================
+   HOGWARTS CORRIDOR – living stone wall, torches, moving portraits
+   ============================================================ */
+
+/* animatable light levels so the wall itself flickers with the torches */
+@property --flick-a { syntax: "<number>"; inherits: false; initial-value: 1; }
+@property --flick-b { syntax: "<number>"; inherits: false; initial-value: 1; }
+
+/* ---------- scene: warm breathing haze + floating candles ---------- */
+.gallery-scene::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 42%, #7a431c55 0, #3a1f1022 45%, transparent 70%);
+  animation: haze-breathe 6s ease-in-out infinite;
+}
+
+/* three floating candles above the wall */
+.gallery-scene::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 14dvh;
+  pointer-events: none;
+  background:
+    /* flames */
+    radial-gradient(ellipse 4px 8px at 16% 20px, #fff6c4 0, #ffc04d 45%, #f07a1a 75%, transparent 100%),
+    radial-gradient(ellipse 4px 8px at 50% 8px,  #fff6c4 0, #ffc04d 45%, #f07a1a 75%, transparent 100%),
+    radial-gradient(ellipse 4px 8px at 84% 28px, #fff6c4 0, #ffc04d 45%, #f07a1a 75%, transparent 100%),
+    /* wax */
+    linear-gradient(#f5e8c6, #c4ab78) 16% 24px / 6px 24px no-repeat,
+    linear-gradient(#f5e8c6, #c4ab78) 50% 12px / 6px 24px no-repeat,
+    linear-gradient(#f5e8c6, #c4ab78) 84% 32px / 6px 24px no-repeat;
+  filter: drop-shadow(0 0 9px #ffa83acc);
+  animation: candles-float 6.5s ease-in-out infinite, candle-glow 2.3s ease-in-out infinite;
+}
+
+/* ---------- the stone wall ---------- */
+.gallery-wall {
+  border: 12px solid #2a201a;
+  background:
+    /* torch light, left + right (flickers via --flick-a / --flick-b) */
+    radial-gradient(circle at 14% 58%, rgb(255 165 60 / calc(.45 * var(--flick-a))) 0, rgb(255 120 30 / calc(.17 * var(--flick-a))) 22%, transparent 48%),
+    radial-gradient(circle at 86% 46%, rgb(255 165 60 / calc(.45 * var(--flick-b))) 0, rgb(255 120 30 / calc(.17 * var(--flick-b))) 22%, transparent 48%),
+    /* dark corners */
+    radial-gradient(ellipse at 50% 50%, transparent 38%, #000c 100%),
+    /* stone bricks */
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='96' height='64'><defs><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' seed='4'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .55 0'/></filter></defs><rect width='96' height='64' fill='%2316100c'/><rect x='1' y='1' width='46' height='30' rx='2' fill='%2356483c'/><rect x='49' y='1' width='46' height='30' rx='2' fill='%234a3d32'/><rect x='-23' y='33' width='46' height='30' rx='2' fill='%234d4034'/><rect x='25' y='33' width='46' height='30' rx='2' fill='%2359493d'/><rect x='73' y='33' width='46' height='30' rx='2' fill='%23483b30'/><rect width='96' height='64' filter='url(%23n)' opacity='.5'/></svg>") 0 0 / 96px 64px,
+    #2a211b;
+  box-shadow:
+    inset 0 0 60px #000d,
+    inset 0 0 0 2px #0008,
+    0 0 0 2px #0009,
+    0 16px 34px #000b;
+  animation: wall-flicker-a 3.1s linear infinite, wall-flicker-b 2.6s linear infinite;
+}
+
+/* ---------- wall torches (left = ::before, right = ::after) ---------- */
+.gallery-wall::before,
+.gallery-wall::after {
+  content: "";
+  position: absolute;
+  width: 110px;
+  height: 110px;
+  pointer-events: none;
+  transform-origin: 50% 62%;
+  background:
+    radial-gradient(ellipse 3px 8px at 50% 40%, #fffbe0 0, transparent 100%),                               /* hot core */
+    radial-gradient(ellipse 8px 16px at 50% 38%, #ffe27a 0, #ffb02e 45%, #f2641a 75%, transparent 100%),  /* flame */
+    linear-gradient(#6d4e2c, #2b1b0e) 50% 52% / 20px 9px no-repeat,                                         /* cup */
+    linear-gradient(#4a3524, #1f150d) 50% 92% / 7px 44px no-repeat,                                         /* bracket */
+    radial-gradient(circle at 50% 38%, #ffb34777 0, #ff8a2a28 30%, transparent 62%);                        /* glow */
+  animation: torch-flicker 1.9s ease-in-out infinite;
+}
+.gallery-wall::before { left: 1%;  top: 48%; }
+.gallery-wall::after  { right: 1%; top: 36%; animation-delay: -.8s; animation-duration: 2.3s; z-index: 3; }
+
+/* ---------- gilded, living portraits ---------- */
+.art-frame {
+  cursor: pointer;
+  padding: 5px;
+  border: 6px solid transparent;
+  background:
+    linear-gradient(#24130c, #24130c) padding-box,
+    linear-gradient(135deg, #f5d887 0%, #9a7129 28%, #e9c46c 52%, #7a5420 78%, #d9ae55 100%) border-box;
+  box-shadow: 3px 9px 13px #000d, 0 0 0 1px #0008, inset 0 0 9px #000;
+  transition: filter .3s ease, transform .3s ease;
+}
+.art-frame:active { filter: brightness(1.25); transform: scale(.985); }
+
+/* the picture "breathes" and drifts like an enchanted portrait */
+.art-frame img {
+  transform-origin: 50% 40%;
+  filter: sepia(.18) saturate(1.1) contrast(1.05);
+  animation: frame-alive 11s ease-in-out infinite;
+}
+.art-frame--1 img { animation-duration: 13s; animation-delay: -3s; }
+.art-frame--2 img { animation-duration: 9.5s; animation-delay: -6s; }
+.art-frame--3 img { animation-duration: 12s;  animation-delay: -8s; }
+
+/* torch-light flicker cast on the canvas */
+.art-frame::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  background:
+    radial-gradient(ellipse at 50% 125%, #ffa63c77, transparent 65%),
+    linear-gradient(transparent 55%, #00000044);
+  animation: frame-flicker 3.4s ease-in-out infinite;
+}
+.art-frame--2::before { animation-delay: -1.1s; }
+.art-frame--3::before { animation-delay: -2.2s; }
+
+/* magical sheen sweeping across the glass */
+.art-frame::after {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(115deg, transparent 38%, #fff3c044 50%, transparent 62%);
+  background-size: 250% 100%;
+  animation: sheen 7s ease-in-out infinite;
+}
+.art-frame--1::after { animation-delay: -2s; }
+.art-frame--2::after { animation-delay: -4s; }
+.art-frame--3::after { animation-delay: -5.5s; }
+
+.art-frame--portrait {
+  border-width: 9px;
+  animation: portrait-glow-live 3.6s ease-in-out infinite;
+}
+
+/* ---------- text + modal polish ---------- */
+.collection-note {
+  color: #f1d48f;
+  text-shadow: 0 0 10px #e7a73f88;
+  animation: text-glow 3.2s ease-in-out infinite;
+}
+.artwork-modal {
+  backdrop-filter: blur(3px);
+  animation: magical-arrive .5s cubic-bezier(.18,.84,.32,1) both;
+}
+.artwork-modal img {
+  animation: modal-glow 3s ease-in-out infinite;
+}
+
+/* ---------- keyframes ---------- */
+@keyframes wall-flicker-a {
+  0%, 100% { --flick-a: 1; }
+  12% { --flick-a: .72; }
+  27% { --flick-a: 1.15; }
+  41% { --flick-a: .85; }
+  58% { --flick-a: 1.1; }
+  73% { --flick-a: .78; }
+  88% { --flick-a: 1.05; }
+}
+@keyframes wall-flicker-b {
+  0%, 100% { --flick-b: 1; }
+  15% { --flick-b: 1.15; }
+  30% { --flick-b: .75; }
+  47% { --flick-b: 1.08; }
+  63% { --flick-b: .82; }
+  80% { --flick-b: 1.12; }
+}
+@keyframes torch-flicker {
+  0%, 100% { filter: brightness(1);    transform: scale(1); }
+  18% { filter: brightness(1.3);  transform: scale(1.04) rotate(1deg); }
+  35% { filter: brightness(.85);  transform: scale(.98) rotate(-1deg); }
+  52% { filter: brightness(1.2);  transform: scale(1.03); }
+  70% { filter: brightness(.92);  transform: scale(1) rotate(.8deg); }
+  86% { filter: brightness(1.25); transform: scale(1.05) rotate(-.6deg); }
+}
+@keyframes frame-alive {
+  0%, 100% { transform: scale(1.03) translate(0, 0); }
+  22% { transform: scale(1.06)  translate(-1.6%, -1%); }
+  48% { transform: scale(1.045) translate(1.2%, .8%); }
+  74% { transform: scale(1.07)  translate(.6%, -1.4%); }
+}
+@keyframes frame-flicker {
+  0%, 100% { opacity: .55; }
+  15% { opacity: .9; }
+  30% { opacity: .45; }
+  52% { opacity: 1; }
+  70% { opacity: .6; }
+  85% { opacity: .85; }
+}
+@keyframes sheen {
+  0%, 55% { background-position: 140% 0; }
+  100% { background-position: -40% 0; }
+}
+@keyframes portrait-glow-live {
+  0%, 100% { box-shadow: 3px 9px 13px #000d, 0 0 14px #d6a54655, inset 0 0 9px #000; }
+  50% { box-shadow: 3px 9px 13px #000d, 0 0 30px #f0b95aaa, inset 0 0 9px #000; }
+}
+@keyframes candles-float {
+  50% { transform: translateY(-9px); }
+}
+@keyframes candle-glow {
+  0%, 100% { filter: drop-shadow(0 0 8px #ffa83acc) brightness(1); }
+  40% { filter: drop-shadow(0 0 14px #ffb84dee) brightness(1.2); }
+  70% { filter: drop-shadow(0 0 6px #ff9a2ab0) brightness(.9); }
+}
+@keyframes haze-breathe {
+  50% { opacity: .6; transform: scale(1.06); }
+}
+@keyframes text-glow {
+  50% { opacity: .7; text-shadow: 0 0 18px #f3b94f; }
+}
+@keyframes modal-glow {
+  50% { box-shadow: 0 0 70px #f0b95a88; }
+}
+
+
+
+
+/* ============================================================
+   OLLIVANDERS – sign hanging from an iron rod on chains
+   ============================================================ */
+
+.sign-rig {
+  position: relative;
+  width: 270px;
+  margin: 36px 0 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* the iron rod, with a brass knob on each end */
+.sign-rod {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 10px;
+  border-radius: 6px;
+  background: linear-gradient(#7a6850, #1c1510);
+  box-shadow: 0 5px 9px #000a;
+}
+.sign-rod::before,
+.sign-rod::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  transform: translateY(-50%);
+  background: radial-gradient(circle at 35% 30%, #f0cf84, #8a6224 55%, #3d2810 100%);
+  box-shadow: 0 3px 7px #000b;
+}
+.sign-rod::before { left: -10px; }
+.sign-rod::after  { right: -10px; }
+
+/* everything under the rod swings from the rod */
+.sign-swing {
+  position: relative;
+  width: 225px;
+  margin-top: -2px;
+  transform-origin: 50% 0;
+  animation: sign-sway 4s ease-in-out infinite;
+}
+.sign-swing--swing {
+  animation: sign-swing 1.2s ease-in-out;
+}
+
+/* chains: little links made from a repeating gradient */
+.sign-chain {
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  width: 5px;
+  height: 38px;
+  border-radius: 3px;
+  background: repeating-linear-gradient(
+    #b79553 0 5px,
+    #3b2a14 5px 8px
+  );
+  box-shadow: 0 0 3px #000a;
+}
+.sign-chain--left  { left: 22px; }
+.sign-chain--right { right: 22px; }
+
+/* the sign itself no longer swings on its own */
+.ollivander-sign {
+  z-index: 1;
+  margin-top: 36px;
+  animation: none;
+}
+.ollivander-sign::before { content: none; }
+.ollivander-sign--swing { animation: none; }
+
+/* ============================================================
+   SHARED FLAME
+   ============================================================ */
+.flame {
+  position: absolute;
+  width: 14px;
+  height: 30px;
+  border-radius: 50% 50% 50% 50% / 65% 65% 35% 35%;
+  background: radial-gradient(ellipse at 50% 80%, #fff 0, #fff1b8 20%, #ffc24a 48%, #f2751a 78%, #c9461300 100%);
+  filter: drop-shadow(0 0 8px #ffa63c) drop-shadow(0 0 18px #ff8a2a88);
+  transform-origin: 50% 100%;
+  animation: flame-sway 1.5s ease-in-out infinite;
+}
+
+@keyframes flame-sway {
+
+  0%,
+  100% {
+    transform: scale(1, 1) rotate(-3deg);
+  }
+
+  20% {
+    transform: scale(.88, 1.14) rotate(3deg);
+  }
+
+  45% {
+    transform: scale(1.08, .92) rotate(-1.5deg);
+  }
+
+  70% {
+    transform: scale(.92, 1.08) rotate(2.5deg);
+  }
+}
+
+/* ============================================================
+   FAMILIAR – gilded arched frame with wall torches
+   ============================================================ */
+.phase-three--familiar {
+  background: radial-gradient(ellipse at 50% 40%, #33200f 0, #120b09 58%, #030303 100%);
+}
+
+.familiar-frame {
+  position: relative;
+  width: min(68vw, 270px);
+  margin: 4px 0 18px;
+}
+
+.familiar-window {
+  position: relative;
+  overflow: hidden;
+  border: 10px solid transparent;
+  border-radius: 140px 140px 12px 12px;
+  background:
+    radial-gradient(ellipse at 50% 28%, #25302f 0, #0f1313 55%, #040505 100%) padding-box,
+    linear-gradient(135deg, #f5d887 0%, #9a7129 28%, #e9c46c 52%, #7a5420 78%, #d9ae55 100%) border-box;
+  box-shadow: 0 18px 30px #000c, 0 0 0 2px #000a, inset 0 0 30px #000;
+}
+
+/* warm torchlight washing in from both sides */
+.familiar-window::before {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  background:
+    radial-gradient(ellipse at 0% 50%, #ff9a3a55, transparent 60%),
+    radial-gradient(ellipse at 100% 50%, #ff9a3a55, transparent 60%);
+  animation: frame-flicker 3.4s ease-in-out infinite;
+}
+
+/* low fog */
+.familiar-window::after {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  inset: auto 0 0 0;
+  height: 35%;
+  pointer-events: none;
+  background: linear-gradient(transparent, #8c7a6a33);
+  animation: text-glow 5s ease-in-out infinite;
+}
+
+.familiar-window .toothless {
+  z-index: 1;
+  width: 100%;
+}
+
+.familiar-window .toothless img {
+  filter: brightness(.8) drop-shadow(0 15px 9px #000);
+}
+
+/* wall torches */
+.sconce {
+  position: absolute;
+  top: 36%;
+  width: 14px;
+  height: 64px;
+  background: linear-gradient(#4a3524, #1f150d) 50% 14px / 6px 50px no-repeat;
+}
+
+.sconce--left {
+  left: -32px;
+}
+
+.sconce--right {
+  right: -32px;
+}
+
+.sconce::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 22px;
+  height: 12px;
+  translate: -50% 0;
+  border-radius: 2px 2px 10px 10px;
+  background: linear-gradient(#a98446, #4b3217);
+}
+
+.sconce::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 50%;
+  top: -26px;
+  width: 170px;
+  height: 170px;
+  translate: -50% -50%;
+  pointer-events: none;
+  background: radial-gradient(circle, #ffa63c44 0, #ff8a2a18 40%, transparent 68%);
+  animation: frame-flicker 2.4s ease-in-out infinite;
+}
+
+.sconce .flame {
+  left: 50%;
+  bottom: calc(100% - 2px);
+  translate: -50% 0;
+}
+
+/* brass nameplate */
+.familiar-label {
+  padding: 8px 24px;
+  border: 1px solid #b08a46;
+  letter-spacing: .08em;
+  background: linear-gradient(#3a2414, #1f120b);
+  box-shadow: 0 6px 14px #000a, inset 0 0 10px #d89b3322;
+  text-shadow: 0 0 12px #e8ad4d66;
+}
+
+/* ============================================================
+   CAKE – image blended into the scene (lit + unlit)
+   ============================================================ */
+.cake {
+  position: relative;
+  width: min(90vw, 420px);
+  padding: 0;
+}
+
+.cake img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 44dvh;
+  object-fit: contain;
+  /* warm it, then fade the edges so the photo background melts away */
+  filter: sepia(.3) saturate(.9) contrast(1.05) brightness(.88);
+  -webkit-mask-image: radial-gradient(ellipse 70% 68% at 50% 50%, #000 52%, transparent 100%);
+  mask-image: radial-gradient(ellipse 70% 68% at 50% 50%, #000 52%, transparent 100%);
+  animation: none;
+  transition: filter 1.2s ease;
+}
+
+/* warm glow behind it */
+.cake::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: -8% -12%;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 55%, #d9791f55 0, #5a2d1522 45%, transparent 70%);
+  transition: opacity 1.2s ease;
+}
+
+/* dark vignette that ties it to the stone/parchment tones */
+.cake::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  background: radial-gradient(ellipse at 50% 50%, transparent 45%, #1a0d0899 100%);
+  animation: none;
+}
+
+.cake--lit img {
+  animation: cake-flicker 2.8s ease-in-out infinite;
+}
+
+@keyframes cake-flicker {
+
+  0%,
+  100% {
+    filter: sepia(.3) saturate(.9) contrast(1.05) brightness(.88);
+  }
+
+  35% {
+    filter: sepia(.3) saturate(.95) contrast(1.05) brightness(1);
+  }
+
+  65% {
+    filter: sepia(.3) saturate(.9) contrast(1.05) brightness(.82);
+  }
+}
+
+.cake--unlit {
+  width: min(94vw, 460px);
+  filter: none;
+}
+
+.cake--unlit img {
+  max-height: 40dvh;
+  filter: sepia(.3) saturate(.85) contrast(1.05) brightness(.78);
+}
+
+/* ============================================================
+   CAKE – arch of candles over the text
+   ============================================================ */
+.wish-arch {
+  position: relative;
+  width: min(90vw, 420px);
+  padding-top: 118px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.wish-arch__candles {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 230px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.arch-candle {
+  position: absolute;
+  width: 8px;
+  height: 24px;
+  translate: -50% 0;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #c9b080, #f5e8c6 45%, #a88c58);
+  box-shadow: 0 0 10px #ffb34755;
+  animation: arch-bob 4.6s ease-in-out infinite;
+  animation-delay: var(--d);
+}
+
+.arch-candle .flame {
+  left: 50%;
+  bottom: calc(100% - 1px);
+  translate: -50% 0;
+  width: 12px;
+  height: 26px;
+  animation-delay: var(--d);
+}
+
+@keyframes arch-bob {
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+/* smoke puff, only used when blowing out */
+.smoke {
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  width: 8px;
+  height: 8px;
+  translate: -50% 0;
+  border-radius: 50%;
+  background: #cbbba8;
+  filter: blur(4px);
+  opacity: 0;
+}
+
+/* blown out: flames stretch, lean away and vanish, left to right */
+.wish-arch--out .flame {
+  animation: flame-out 1.1s ease-in forwards;
+  animation-delay: var(--o);
+}
+
+.wish-arch--out .smoke {
+  animation: smoke-rise 1.6s ease-out forwards;
+  animation-delay: calc(var(--o) + .35s);
+}
+
+.wish-arch--out .arch-candle {
+  box-shadow: none;
+  transition: box-shadow .6s;
+}
+
+.wish-arch--out .cake::before {
+  opacity: 0;
+}
+
+.wish-arch--out .cake--lit img {
+  animation: none;
+  filter: sepia(.3) saturate(.85) contrast(1.05) brightness(.7);
+}
+
+@keyframes flame-out {
+  0% {
+    opacity: 1;
+    transform: scale(1.2, 1.5) rotate(8deg);
+  }
+
+  40% {
+    opacity: .9;
+    transform: scale(.7, 2) translateY(-6px) rotate(-10deg);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(.1, 2.6) translateY(-46px) rotate(14deg);
+  }
+}
+
+@keyframes smoke-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(.6);
+  }
+
+  30% {
+    opacity: .7;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-70px) translateX(10px) scale(2.6);
+  }
+}
+
+/* ============================================================
+   GIFT BOX – portrait tiles for Lini portrait + wand
+   ============================================================ */
+.gift-grid {
+  align-items: start;
+}
+
+.gift-item--portrait img,
+.gift-item--wand img {
+  height: auto;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  opacity: .9;
+}
+
+.gift-item--wand img {
+  object-fit: contain;
+  padding: 10px;
+  background: radial-gradient(circle at 50% 40%, #3b2416, #140c09);
+}
+
+.gift-view--portrait img,
+.gift-view--wand img {
+  width: min(64vw, 280px);
+  height: auto;
+  max-height: 56dvh;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+}
+
+.gift-view--wand img {
+  object-fit: contain;
+  padding: 14px;
+  background: radial-gradient(circle at 50% 40%, #3b2416, #140c09);
 }
