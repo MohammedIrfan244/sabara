@@ -2288,3 +2288,899 @@ button:focus-visible {
   padding: 14px;
   background: radial-gradient(circle at 50% 40%, #3b2416, #140c09);
 }
+
+
+
+
+/* =========================================================
+   PHASE FIVE — MARAUDER'S MAP
+   ========================================================= */
+
+.phase-five {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 100vh;
+  color: #2a1b0f;
+  font-family: "IM Fell English", serif;
+}
+
+
+/* ---------------------------------------------------------
+   MAP INTRO
+   --------------------------------------------------------- */
+
+.map-intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  background:
+    radial-gradient(circle at 50% 45%, #21150d 0%, #090706 58%, #020202 100%);
+}
+
+.map-intro::before {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  z-index: -1;
+  opacity: 0.22;
+  background:
+    radial-gradient(circle at 20% 30%, #b07b3c 0 1px, transparent 2px),
+    radial-gradient(circle at 70% 65%, #b07b3c 0 1px, transparent 2px),
+    radial-gradient(circle at 40% 80%, #8c5a2c 0 1px, transparent 2px);
+  background-size: 90px 110px, 130px 150px, 170px 130px;
+  animation: map-dust 18s linear infinite;
+}
+
+.folded-map {
+  position: relative;
+  width: min(76vw, 390px);
+  min-height: 235px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+
+  padding: 45px 35px;
+
+  color: #392414;
+
+  background:
+    linear-gradient(135deg,
+      rgba(255, 239, 185, 0.7),
+      transparent 18%,
+      transparent 82%,
+      rgba(88, 48, 17, 0.18)),
+    repeating-linear-gradient(0deg,
+      rgba(91, 53, 20, 0.035) 0,
+      rgba(91, 53, 20, 0.035) 1px,
+      transparent 1px,
+      transparent 4px),
+    linear-gradient(110deg,
+      #c6a56b,
+      #e1c789 28%,
+      #d1b171 55%,
+      #a9824e);
+
+  border: 1px solid #806038;
+
+  box-shadow:
+    0 25px 55px #000b,
+    inset 0 0 30px #4b2b1099,
+    inset 0 0 5px #fff3;
+
+  transform: rotate(-1.5deg);
+
+  animation:
+    folded-map-float 5s ease-in-out infinite,
+    folded-map-shadow 5s ease-in-out infinite;
+}
+
+/* aged corners */
+.folded-map::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  background:
+    radial-gradient(ellipse at 0% 0%,
+      #5c351d99 0,
+      transparent 22%),
+    radial-gradient(ellipse at 100% 0%,
+      #5c351d66 0,
+      transparent 20%),
+    radial-gradient(ellipse at 0% 100%,
+      #4b291866 0,
+      transparent 25%),
+    radial-gradient(ellipse at 100% 100%,
+      #4b291899 0,
+      transparent 24%);
+}
+
+/* paper grain / fibres */
+.folded-map::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.28;
+
+  background:
+    repeating-linear-gradient(92deg,
+      transparent 0,
+      transparent 3px,
+      #57371718 4px,
+      transparent 5px),
+    repeating-linear-gradient(8deg,
+      transparent 0,
+      transparent 7px,
+      #fff2 8px,
+      transparent 9px);
+
+  mix-blend-mode: multiply;
+}
+
+.folded-map span {
+  position: relative;
+  z-index: 2;
+
+  font-size: 32px;
+  color: #5c331b;
+
+  animation: map-star 3s ease-in-out infinite;
+}
+
+.folded-map p {
+  position: relative;
+  z-index: 2;
+
+  margin: 0;
+
+  font-family: "Cinzel Decorative", serif;
+  font-size: clamp(20px, 4vw, 30px);
+  text-align: center;
+
+  text-shadow: 0 1px #ead19a;
+}
+
+.folded-map::marker {
+  display: none;
+}
+
+
+/* folded creases */
+.folded-map {
+  background-image:
+    linear-gradient(90deg,
+      transparent 47%,
+      rgba(75, 42, 16, 0.2) 49%,
+      rgba(255, 239, 185, 0.3) 50%,
+      transparent 52%),
+    linear-gradient(0deg,
+      transparent 47%,
+      rgba(75, 42, 16, 0.14) 49%,
+      rgba(255, 239, 185, 0.25) 50%,
+      transparent 52%),
+    repeating-linear-gradient(0deg,
+      rgba(91, 53, 20, 0.035) 0,
+      rgba(91, 53, 20, 0.035) 1px,
+      transparent 1px,
+      transparent 4px),
+    linear-gradient(110deg,
+      #c6a56b,
+      #e1c789 28%,
+      #d1b171 55%,
+      #a9824e);
+}
+
+.scene-kicker {
+  margin: 0;
+
+  color: #d5b77b;
+  font-style: italic;
+  font-size: 17px;
+
+  opacity: 0.85;
+
+  animation: kicker-breathe 4s ease-in-out infinite;
+}
+
+
+/* ---------------------------------------------------------
+   HOLD BUTTON
+   --------------------------------------------------------- */
+
+.hold-spell {
+  position: relative;
+
+  border: 1px solid #8b693c;
+  padding: 14px 28px;
+
+  color: #e8d09a;
+  background: #160f0a;
+
+  font-family: "IM Fell English", serif;
+  font-size: 18px;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 8px 20px #0008,
+    inset 0 0 15px #8d602522;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.hold-spell::before {
+  content: "";
+  position: absolute;
+  inset: 4px;
+
+  border: 1px solid #c9a96744;
+  pointer-events: none;
+}
+
+.hold-spell small {
+  display: block;
+  margin-top: 4px;
+
+  font-size: 12px;
+  opacity: 0.65;
+}
+
+.hold-spell:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 12px 28px #0009,
+    0 0 20px #b17d3a22,
+    inset 0 0 15px #8d602533;
+}
+
+.hold-spell--active {
+  transform: scale(0.97);
+
+  background: #21150c;
+
+  box-shadow:
+    0 4px 12px #0009,
+    inset 0 0 30px #b17d3a44;
+}
+
+
+/* ---------------------------------------------------------
+   OPEN MAP
+   --------------------------------------------------------- */
+
+.map-open {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  padding:
+    clamp(70px, 10vh, 110px) 20px 100px;
+
+  background:
+    radial-gradient(ellipse at 50% 20%,
+      rgba(231, 201, 133, 0.75),
+      transparent 38%),
+    linear-gradient(90deg,
+      #8c693d,
+      #d2b276 10%,
+      #e1c78f 50%,
+      #c4a46d 90%,
+      #76542f);
+
+  animation: map-open-reveal 1.2s ease-out both;
+}
+
+/* dark parchment edges */
+.map-open::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  pointer-events: none;
+
+  background:
+    radial-gradient(ellipse at center,
+      transparent 45%,
+      rgba(58, 31, 13, 0.2) 75%,
+      rgba(33, 17, 7, 0.75) 100%);
+
+  z-index: -1;
+}
+
+/* parchment texture */
+.map-open::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  pointer-events: none;
+
+  opacity: 0.3;
+
+  background:
+    repeating-linear-gradient(83deg,
+      transparent 0,
+      transparent 5px,
+      rgba(75, 43, 17, 0.08) 6px,
+      transparent 8px),
+    repeating-linear-gradient(175deg,
+      transparent 0,
+      transparent 8px,
+      rgba(255, 244, 203, 0.13) 9px,
+      transparent 11px);
+
+  mix-blend-mode: multiply;
+}
+
+
+/* ---------------------------------------------------------
+   MAP INK DECORATION
+   --------------------------------------------------------- */
+
+.map-ink {
+  position: absolute;
+  inset: 0;
+
+  pointer-events: none;
+  overflow: hidden;
+
+  opacity: 0.7;
+}
+
+.map-ink i {
+  position: absolute;
+
+  width: 180px;
+  height: 1px;
+
+  background: #49311c66;
+
+  transform-origin: left center;
+
+  animation: ink-drift 9s ease-in-out infinite;
+}
+
+.map-ink i:nth-child(1) {
+  top: 18%;
+  left: 4%;
+  transform: rotate(18deg);
+}
+
+.map-ink i:nth-child(2) {
+  top: 67%;
+  right: 0;
+  transform: rotate(-22deg);
+  animation-delay: -3s;
+}
+
+.map-ink i:nth-child(3) {
+  top: 42%;
+  left: 20%;
+  width: 100px;
+  transform: rotate(-8deg);
+  animation-delay: -6s;
+}
+
+
+/* ---------------------------------------------------------
+   TITLE
+   --------------------------------------------------------- */
+
+.map-title {
+  position: relative;
+
+  max-width: 850px;
+  margin: 0 0 20px;
+
+  text-align: center;
+
+  font-family: "Cinzel Decorative", serif;
+  font-size: clamp(24px, 4vw, 42px);
+  line-height: 1.3;
+
+  color: #332014;
+
+  text-shadow:
+    0 1px #f2dda9,
+    1px 1px #76502a;
+
+  animation:
+    ink-write 1.5s ease-out both,
+    title-breathe 6s ease-in-out 1.5s infinite;
+}
+
+
+/* ---------------------------------------------------------
+   FOOTPRINTS
+   --------------------------------------------------------- */
+
+.footprints {
+  position: relative;
+
+  margin: 0 0 35px;
+
+  color: #55391f;
+
+  letter-spacing: 9px;
+  opacity: 0.55;
+
+  animation:
+    footprints-walk 7s ease-in-out infinite,
+    footprints-fade 4s ease-in-out infinite;
+}
+
+
+/* ---------------------------------------------------------
+   FORM — WRITTEN INTO THE MAP
+   --------------------------------------------------------- */
+
+.map-form {
+  position: relative;
+
+  width: min(92vw, 650px);
+
+  padding: 38px 34px 34px;
+
+  background:
+    linear-gradient(135deg,
+      rgba(255, 239, 191, 0.3),
+      transparent 45%,
+      rgba(79, 46, 19, 0.08));
+
+  border: 1px solid #72502d66;
+
+  box-shadow:
+    0 18px 45px #4a2a1266,
+    inset 0 0 30px #6b451d22;
+
+  animation: form-arrive 1s ease-out 0.35s both;
+}
+
+.map-form::before {
+  content: "";
+
+  position: absolute;
+  inset: 9px;
+
+  border: 1px solid #75512c44;
+
+  pointer-events: none;
+}
+
+.map-form::after {
+  content: "";
+
+  position: absolute;
+
+  width: 70px;
+  height: 70px;
+
+  right: -20px;
+  top: -25px;
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(circle at 35% 30%,
+      #d7bd7a,
+      #907044 65%,
+      #604324);
+
+  opacity: 0.18;
+
+  filter: blur(1px);
+
+  transform: rotate(12deg);
+
+  pointer-events: none;
+}
+
+.map-form label {
+  position: relative;
+  z-index: 1;
+
+  display: block;
+
+  margin-bottom: 15px;
+
+  font-family: "Cinzel Decorative", serif;
+  font-size: clamp(15px, 2.5vw, 21px);
+  line-height: 1.4;
+
+  color: #392414;
+}
+
+.map-form textarea {
+  position: relative;
+  z-index: 1;
+
+  display: block;
+
+  width: 100%;
+  min-height: 180px;
+
+  resize: vertical;
+
+  padding: 18px;
+
+  border: 0;
+  outline: none;
+
+  color: #2f1d0f;
+
+  font-family: "IM Fell English", serif;
+  font-size: 18px;
+  line-height: 1.7;
+
+  background:
+    repeating-linear-gradient(to bottom,
+      transparent 0,
+      transparent 31px,
+      #5b40254d 32px);
+
+  box-shadow:
+    inset 0 0 25px #59371718;
+
+  transition:
+    box-shadow 0.25s ease,
+    background-color 0.25s ease;
+}
+
+.map-form textarea::placeholder {
+  color: #62482799;
+  font-style: italic;
+}
+
+.map-form textarea:focus {
+  box-shadow:
+    inset 0 0 25px #59371722,
+    0 0 0 1px #76502c55;
+
+  background-color: #f0dba733;
+}
+
+
+/* ---------------------------------------------------------
+   SUBMIT
+   --------------------------------------------------------- */
+
+.ink-submit {
+  position: relative;
+  z-index: 2;
+
+  margin-top: 20px;
+
+  border: 1px solid #543719;
+  padding: 13px 27px;
+
+  color: #e6cf99;
+  background:
+    linear-gradient(145deg,
+      #49301b,
+      #24160c);
+
+  font-family: "Cinzel Decorative", serif;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 7px 15px #4a291544,
+    inset 0 1px #d5b87933;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.ink-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 11px 20px #4a291566,
+    0 0 15px #9a713722,
+    inset 0 1px #d5b87955;
+}
+
+.ink-submit:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.ink-submit:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+
+/* ---------------------------------------------------------
+   STATUS
+   --------------------------------------------------------- */
+
+.form-error,
+.form-success {
+  position: relative;
+  z-index: 2;
+
+  margin: 14px 0 0;
+
+  font-style: italic;
+}
+
+.form-error {
+  color: #6e2018;
+}
+
+.form-success {
+  color: #315024;
+}
+
+
+/* ---------------------------------------------------------
+   NOX
+   --------------------------------------------------------- */
+
+.nox-button {
+  position: relative;
+
+  margin-top: 40px;
+
+  border: 0;
+
+  padding: 15px 45px;
+
+  color: #e5d3ad;
+  background: transparent;
+
+  font-family: "Cinzel Decorative", serif;
+  font-size: 22px;
+
+  cursor: pointer;
+
+  text-shadow:
+    0 0 8px #cdb47b,
+    0 0 20px #806331;
+
+  animation: nox-breathe 3s ease-in-out infinite;
+
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease;
+}
+
+.nox-button::before,
+.nox-button::after {
+  content: "✦";
+
+  position: absolute;
+  top: 50%;
+
+  color: #c8ae77;
+
+  transform: translateY(-50%);
+
+  animation: nox-stars 2.5s ease-in-out infinite;
+}
+
+.nox-button::before {
+  left: 0;
+}
+
+.nox-button::after {
+  right: 0;
+  animation-delay: -1.2s;
+}
+
+.nox-button:hover {
+  transform: scale(1.06);
+}
+
+
+/* ---------------------------------------------------------
+   NOX STATE
+   --------------------------------------------------------- */
+
+.map-open--nox {
+  animation:
+    map-nox 0.85s ease-in forwards;
+}
+
+
+/* =========================================================
+   ANIMATIONS
+   ========================================================= */
+
+@keyframes folded-map-float {
+
+  0%,
+  100% {
+    transform: rotate(-1.5deg) translateY(0);
+  }
+
+  50% {
+    transform: rotate(0.8deg) translateY(-8px);
+  }
+}
+
+@keyframes folded-map-shadow {
+
+  0%,
+  100% {
+    filter: drop-shadow(0 0 0 transparent);
+  }
+
+  50% {
+    filter: drop-shadow(0 14px 14px #0004);
+  }
+}
+
+@keyframes map-star {
+
+  0%,
+  100% {
+    transform: scale(1) rotate(0);
+    opacity: 0.65;
+  }
+
+  50% {
+    transform: scale(1.15) rotate(8deg);
+    opacity: 1;
+  }
+}
+
+@keyframes kicker-breathe {
+
+  0%,
+  100% {
+    opacity: 0.65;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes map-dust {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(-60px, -90px, 0);
+  }
+}
+
+@keyframes map-open-reveal {
+  from {
+    opacity: 0;
+    transform: scale(1.03);
+    filter: brightness(0.65) blur(3px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+    filter: brightness(1) blur(0);
+  }
+}
+
+@keyframes ink-drift {
+
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: translateX(0) rotate(var(--angle, 0deg));
+  }
+
+  50% {
+    opacity: 0.65;
+    transform: translateX(25px) rotate(var(--angle, 0deg));
+  }
+}
+
+@keyframes ink-write {
+  from {
+    opacity: 0;
+    clip-path: inset(0 100% 0 0);
+    transform: translateX(-10px);
+  }
+
+  to {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+    transform: translateX(0);
+  }
+}
+
+@keyframes title-breathe {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes footprints-walk {
+
+  0%,
+  100% {
+    transform: translateX(-8px);
+  }
+
+  50% {
+    transform: translateX(8px);
+  }
+}
+
+@keyframes footprints-fade {
+
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes form-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(25px) rotate(1deg);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(0);
+  }
+}
+
+@keyframes nox-breathe {
+
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes nox-stars {
+
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: translateY(-50%) scale(0.8);
+  }
+
+  50% {
+    opacity: 1;
+    transform: translateY(-50%) scale(1.2);
+  }
+}
+
+@keyframes map-nox {
+  0% {
+    filter: brightness(1);
+  }
+
+  100% {
+    filter: brightness(0);
+    opacity: 0;
+  }
+}
