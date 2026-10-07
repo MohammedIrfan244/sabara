@@ -31,6 +31,7 @@ export async function submitGiftMessage(_: GiftMessageState, formData: FormData)
   });
 
   try {
+    console.log({ user, appPassword, to, from });
     await transporter.sendMail({
       from,
       to,
@@ -38,7 +39,8 @@ export async function submitGiftMessage(_: GiftMessageState, formData: FormData)
       html: `<main><h1>A note from Lini</h1><p>${safeMessage}</p></main>`,
     });
     return { ok: true, configured: true };
-  } catch {
-    return { ...initialState, configured: true, error: "The message could not be delivered just yet." };
+  } catch (e) {
+    console.log("Error sending message", e);
+    return { ...initialState, configured: false, error: "The message could not be delivered just yet." };
   }
 }
