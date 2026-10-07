@@ -31,7 +31,6 @@ export async function submitGiftMessage(_: GiftMessageState, formData: FormData)
   });
 
   try {
-    console.log({ user, appPassword, to, from });
     await transporter.sendMail({
       from,
       to,
